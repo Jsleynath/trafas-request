@@ -1,1 +1,1 @@
-This project is build to manage shipment in Trafas.
+This project is build to manage request in Trafas.
