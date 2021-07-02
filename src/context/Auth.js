@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
       async (event, session) => {
         setUser(session?.user ?? null)
         setLoading(false)
-      }
+      },
     )
 
     return () => {

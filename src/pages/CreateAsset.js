@@ -1,23 +1,20 @@
 import React from 'react'
 import PageTitle from '../components/Typography/PageTitle'
-import { Input, Label, Button, Select } from '@windmill/react-ui'
+import { Input, Label, Button } from '@windmill/react-ui'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { unwrapResult } from '@reduxjs/toolkit'
 import toast, { Toaster } from 'react-hot-toast'
 import { FulfillingBouncingCircleSpinner } from 'react-epic-spinners'
-import {
-  clearCreateEmployeeStatus,
-  createNewEmployee,
-} from '../app/employeesSlice'
+import { clearCreateAssetStatus, createNewAsset } from '../app/assetsSlice'
 
-function CreateEmployee() {
+function CreateAsset() {
   const dispatch = useDispatch()
-  const createEmployeeStatus = useSelector(
-    (state) => state.employees.createEmployeeStatus,
+  const createAssetStatus = useSelector(
+    (state) => state.assets.createAssetStatus,
   )
-  const canSave = createEmployeeStatus === 'idle'
+  const canSave = createAssetStatus === 'idle'
 
   const {
     register,
@@ -27,15 +24,16 @@ function CreateEmployee() {
     formState: { isSubmitSuccessful },
   } = useForm({
     defaultValues: {
-      email: '',
-      password: '',
+      name: '',
+      quantity: '',
+      unit: '',
     },
   })
 
   const onSubmit = async (data) => {
     if (canSave)
       try {
-        const resultAction = await dispatch(createNewEmployee(data))
+        const resultAction = await dispatch(createNewAsset(data))
         unwrapResult(resultAction)
         if (resultAction.payload.error === null) {
           toast.success('Berhasil menambahkan data!')
@@ -43,15 +41,16 @@ function CreateEmployee() {
       } catch (error) {
         if (error) throw toast.error('Gagal menambahkan data!')
       } finally {
-        dispatch(clearCreateEmployeeStatus())
+        dispatch(clearCreateAssetStatus())
       }
   }
 
   React.useEffect(() => {
     if (isSubmitSuccessful) {
       reset({
-        email: '',
-        password: '',
+        name: '',
+        quantity: '',
+        unit: '',
       })
     }
   }, [formState, reset])
@@ -88,36 +87,39 @@ function CreateEmployee() {
         }}
       />
 
-      <PageTitle>New Employee</PageTitle>
+      <PageTitle>New Asset</PageTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800 ">
         <form onSubmit={handleSubmit(onSubmit)}>
+          <Label>
+            <span>Name</span>
+            <Input className="mt-1" {...register('name', { required: true })} />
+          </Label>
           <div className="grid gap-6 mt-4 mb-4 md:grid-cols-2 xl:grid-cols-2">
             <Label>
-              <span>Email</span>
+              <span>Qty</span>
               <Input
-                type="email"
                 className="mt-1"
-                {...register('email', { required: true })}
+                type="number"
+                {...register('quantity', { required: true })}
               />
             </Label>
             <Label>
-              <span>Password</span>
+              <span>Unit</span>
               <Input
-                type="password"
                 className="mt-1"
-                {...register('password', { required: true })}
+                {...register('unit', { required: true })}
               />
             </Label>
           </div>
           <div className="flex justify-between mt-5">
             <div>
-              <Button tag={Link} to="/app/employees" size="small">
+              <Button tag={Link} to="/app/assets" size="small">
                 Cancel
               </Button>
             </div>
             <div>
-              {createEmployeeStatus === 'loading' ? (
+              {createAssetStatus === 'loading' ? (
                 <>
                   <FulfillingBouncingCircleSpinner size="20" />
                 </>
@@ -134,4 +136,4 @@ function CreateEmployee() {
   )
 }
 
-export default CreateEmployee
+export default CreateAsset

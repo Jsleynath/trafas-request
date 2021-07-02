@@ -1,23 +1,18 @@
 const routes = [
   {
-    path: '/dashboard',
-    icon: 'HomeIcon',
-    name: 'Dashboard',
+    path: '/app/requests',
+    icon: 'CartIcon',
+    name: 'Requests',
   },
   {
-    path: '/app/shipment',
-    icon: 'MailIcon',
-    name: 'Shipment',
+    path: '/app/assets',
+    icon: 'ModalsIcon',
+    name: 'Assets',
   },
   {
-    path: '/app/schedule',
-    icon: 'GithubIcon',
-    name: 'Courier Schedule',
-  },
-  {
-    path: '/app/employee',
+    path: '/app/employees',
     icon: 'PeopleIcon',
-    name: 'Employee',
+    name: 'Employees',
   },
 ]
 

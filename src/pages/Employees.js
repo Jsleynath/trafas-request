@@ -17,34 +17,37 @@ import { EditIcon, TrashIcon, SearchIcon } from '../icons'
 import { useDispatch, useSelector } from 'react-redux'
 import Fuse from 'fuse.js'
 import {
-  deleteSchedule,
-  fetchSchedule,
-} from '../app/schedulesSlice'
+  clearEmployeeByIdStatus,
+  deleteEmployee,
+  fetchEmployee,
+} from '../app/employeesSlice'
 
-function Schedule() {
+function Employee() {
   const dispatch = useDispatch()
-  const [query, setQuery] = useState('')
-  const response = useSelector((state) => state.schedules.scheduleList)
-  const fuse = new Fuse(response, { keys: ['name', 'role'] })
-  const results = fuse.search(query)
-  const scheduleListStatus = useSelector(
-    (state) => state.schedules.scheduleListStatus, 
-  )
-  const scheduleByIdStatus = useSelector(
-    (state) => state.schedules.scheduleByIdStatus,
-  )
 
-  // useEffect(() => {
-  //   if (scheduleByIdStatus === 'succeeded') {
-  //     dispatch(clearSche())
-  //   }
-  // }, [scheduleByIdStatus, dispatch])
+  const [query, setQuery] = useState('')
+  const response = useSelector((state) => state.employees.employeeList)
+  const fuse = new Fuse(response, { keys: ['name'] })
+
+  const results = fuse.search(query)
+  const employeeListStatus = useSelector(
+    (state) => state.employees.employeeListStatus,
+  )
+  const employeeByIdStatus = useSelector(
+    (state) => state.employees.employeeByIdStatus,
+  )
 
   useEffect(() => {
-    if (scheduleListStatus === 'idle') {
-      dispatch(fetchSchedule())
+    if (employeeByIdStatus === 'succeeded') {
+      dispatch(clearEmployeeByIdStatus())
     }
-  }, [scheduleListStatus, dispatch])
+  }, [employeeByIdStatus, dispatch])
+
+  useEffect(() => {
+    if (employeeListStatus === 'idle') {
+      dispatch(fetchEmployee())
+    }
+  }, [employeeListStatus, dispatch])
 
   const [pageTable, setPageTable] = useState(1)
 
@@ -58,7 +61,7 @@ function Schedule() {
   }
 
   function removeOrganization(id) {
-    dispatch(deleteSchedule(id))
+    dispatch(deleteEmployee(id))
   }
 
   let searchResult = []
@@ -88,17 +91,17 @@ function Schedule() {
     <>
       <PageTitle>
         <div className="flex justify-between">
-          <div>Courier schedule list</div>
+          <div>Employee list</div>
           <div className="float-right">
-            <Button size="small" tag={Link} to="/app/schedule/new">
-              + new schedule
+            <Button size="small" tag={Link} to="/app/employees/new">
+              + new employee
             </Button>
           </div>
         </div>
       </PageTitle>
-      <hr className="mb-4" />
+      <hr className="mb-1" />
       <div className="ml-1  flex py-3 justify-start flex-1 lg:mr-32">
-        <div className="relative w-full  max-w-xl mr-6 focus-within:text-purple-500">
+        <div className="relative w-full max-w-xl mr-6 focus-within:text-purple-500">
           <div className="absolute inset-y-0 flex items-center pl-2">
             <SearchIcon className="w-4 h-4" aria-hidden="true" />
           </div>
@@ -116,6 +119,10 @@ function Schedule() {
           <TableHeader>
             <tr>
               <TableCell>Name</TableCell>
+              <TableCell>Department</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Password</TableCell>
               <TableCell>Role</TableCell>
               <TableCell className="text-center">Action</TableCell>
             </tr>
@@ -124,7 +131,19 @@ function Schedule() {
             {dataTable.map((data, i) => (
               <TableRow key={i}>
                 <TableCell>
-                  <span className="text-sm">{data.name}</span>
+                  <Link to={`/app/employees/detail/${data.id}`} className="text-sm">{data.name}</Link>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{data.department}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{data.phone}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{data.email}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{data.password}</span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">{data.role}</span>
@@ -134,16 +153,7 @@ function Schedule() {
                     <div className=" space-x-4">
                       <Button
                         tag={Link}
-                        to={`/app/shipment/track-trace/${data.id}`}
-                        layout="link"
-                        size="icon"
-                        aria-label="Search"
-                      >
-                        <SearchIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/app/employee/edit/${data.id}`}
+                        to={`/app/employees/edit/${data.id}`}
                         layout="link"
                         size="icon"
                         aria-label="Edit"
@@ -178,4 +188,4 @@ function Schedule() {
   )
 }
 
-export default Schedule
+export default Employee

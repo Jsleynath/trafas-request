@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from '@windmill/react-ui'
 
-import PageTitle from '../components/Typography/PageTitle'
-import CTA from '../components/CTA'
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from '@windmill/react-ui'
-
-function Modals() {
+function Qanswer() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   function openModal() {
@@ -17,18 +20,15 @@ function Modals() {
 
   return (
     <>
-      <PageTitle>Modals</PageTitle>
-      <CTA />
-
-      <div>
+      <div className="flex text-white">
         <Button onClick={openModal}>Open modal</Button>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <ModalHeader>Modal header</ModalHeader>
         <ModalBody>
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nostrum et eligendi repudiandae
-          voluptatem tempore!
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nostrum et
+          eligendi repudiandae voluptatem tempore!
         </ModalBody>
         <ModalFooter>
           {/* I don't like this approach. Consider passing a prop to ModalFooter
@@ -60,4 +60,4 @@ function Modals() {
   )
 }
 
-export default Modals
+export default Qanswer

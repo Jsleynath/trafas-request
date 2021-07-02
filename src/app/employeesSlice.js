@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit'
-import { createClient } from '@supabase/supabase-js'
-const { REACT_APP_SUPABASE_KEY, REACT_APP_SUPABASE_URL } = process.env
-const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_SUPABASE_KEY)
+import { supabase } from '../supabase'
 
 const initialState = {
   employeeList: [],
@@ -40,13 +38,14 @@ export const fetchEmployeeById = createAsyncThunk(
 export const createNewEmployee = createAsyncThunk(
   'employees/createNewEmployee',
   async (data) => {
-    const response = await supabase.from('employees').insert([data])
     const { user, session, error } = await supabase.auth.signUp({
-      email: data.name,
-      password: 'password',
+      email: data.email,
+      password: data.password,
     })
-    console.log(user)
-    return response
+    if (error) {
+      alert(error.message)
+    }
+    return user
   },
 )
 
@@ -65,43 +64,15 @@ export const updateEmployee = createAsyncThunk(
       .from('employees')
       .update({
         name: updatedData.name,
+        department: updatedData.department,
+        phone: updatedData.phone,
         role: updatedData.role,
       })
       .eq('id', updatedData.id)
+    if (error) {
+      alert(JSON.stringify(error))
+    }
     return data
-  },
-)
-
-export const signUp = createAsyncThunk(
-  'employees/signUp',
-  async (data) => {
-    const { user, session, error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-    })
-    if(error){alert(error.message)}
-    return [user,session]
-  },
-)
-
-export const signIn = createAsyncThunk(
-  'employees/signIn',
-  async (data) => {
-    const { user, session, error } = await supabase.auth.signIn({
-      email: data.email,
-      password: data.password,
-    })
-    if(error){alert(error.message)}
-    return [user,session]
-  },
-)
-
-export const signOut = createAsyncThunk(
-  'employees/signOut',
-  async (data) => {
-    const { error } = await supabase.auth.signOut()
-    if(error){alert(error.message)}
-    return null
   },
 )
 

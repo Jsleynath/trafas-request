@@ -18,7 +18,7 @@ import {
   DropdownItem,
   WindmillContext,
 } from '@windmill/react-ui'
-import { useAuth } from '../contexts/Auth'
+import { useAuth } from '../context/Auth'
 import { useHistory } from 'react-router-dom'
 
 function Header() {

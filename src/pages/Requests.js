@@ -15,57 +15,42 @@ import {
 } from '@windmill/react-ui'
 import { EditIcon, TrashIcon, SearchIcon } from '../icons'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  clearShipmentByIdStatus,
-  deleteShipment,
-  fetchShipment,
-} from '../app/shipmentsSlice'
 import Fuse from 'fuse.js'
-import toast, { Toaster } from 'react-hot-toast'
-import { clearShipmentStatusAuditByIdStatus } from '../app/shipmentStatusAuditsSlice'
+import {
+  clearRequestByIdStatus,
+  deleteRequest,
+  fetchRequest,
+} from '../app/requestsSlice'
 
-function Shipment() {
+function Requests() {
   const dispatch = useDispatch()
 
-  const response = useSelector((state) => state.shipments.shipmentList)
-  const shipmentListStatus = useSelector(
-    (state) => state.shipments.shipmentListStatus,
-  )
-  const shipmentByIdStatus = useSelector(
-    (state) => state.shipments.shipmentByIdStatus,
-  )
-  const shipmentDeleteStatus = useSelector(
-    (state) => state.shipments.shipmentDeleteStatus,
-  )
-  const shipmentStatusAuditByIdStatus = useSelector(
-    (state) => state.shipmentStatusAudits.shipmentStatusAuditByIdStatus,
-  )
-
   const [query, setQuery] = useState('')
-  const fuse = new Fuse(response, {
-    keys: ['transfer_no', 'customer_name', 'status'],
-  })
+  const response = useSelector((state) => state.requests.requestList)
+  const fuse = new Fuse(response, { keys: ['name'] })
+
   const results = fuse.search(query)
+  const requestListStatus = useSelector(
+    (state) => state.requests.requestListStatus,
+  )
+  const requestByIdStatus = useSelector(
+    (state) => state.requests.requestByIdStatus,
+  )
 
   useEffect(() => {
-    if (shipmentByIdStatus === 'succeeded') {
-      dispatch(clearShipmentByIdStatus())
+    if (requestByIdStatus === 'succeeded') {
+      dispatch(clearRequestByIdStatus())
     }
-  }, [shipmentByIdStatus, dispatch])
+  }, [requestByIdStatus, dispatch])
 
   useEffect(() => {
-    if (shipmentStatusAuditByIdStatus === 'succeeded') {
-      dispatch(clearShipmentStatusAuditByIdStatus())
+    if (requestListStatus === 'idle') {
+      dispatch(fetchRequest())
     }
-  }, [shipmentStatusAuditByIdStatus, dispatch])
-
-  useEffect(() => {
-    if (shipmentListStatus === 'idle') {
-      dispatch(fetchShipment())
-    }
-  }, [shipmentListStatus, dispatch])
+  }, [requestListStatus, dispatch])
 
   const [pageTable, setPageTable] = useState(1)
+
   const [dataTable, setDataTable] = useState([])
 
   const resultsPerPage = 7
@@ -76,14 +61,8 @@ function Shipment() {
   }
 
   function removeOrganization(id) {
-    dispatch(deleteShipment(id))
+    dispatch(deleteRequest(id))
   }
-
-  useEffect(() => {
-    if (shipmentDeleteStatus === 'succeeded') {
-      toast.success('Berhasil menghapus data!')
-    }
-  }, [shipmentDeleteStatus])
 
   let searchResult = []
   useEffect(() => {
@@ -110,48 +89,19 @@ function Shipment() {
 
   return (
     <>
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        toastOptions={{
-          className: '',
-          style: {
-            marginTop: '90px',
-            marginRight: '40px',
-            background: '#363636',
-            color: '#fff',
-            zIndex: 1,
-          },
-          duration: 5000,
-          success: {
-            duration: 2000,
-            theme: {
-              primary: 'green',
-              secondary: 'black',
-            },
-          },
-          error: {
-            duration: 2000,
-            theme: {
-              primary: 'green',
-              secondary: 'black',
-            },
-          },
-        }}
-      />
       <PageTitle>
         <div className="flex justify-between">
-          <div>Shipment list</div>
+          <div>Request list</div>
           <div className="float-right">
-            <Button size="small" tag={Link} to="/app/shipment/new">
-              + new shipment
+            <Button size="small" tag={Link} to="/app/requests/new">
+              + new request
             </Button>
           </div>
         </div>
       </PageTitle>
-      <hr className="mb-4" />
+      <hr className="mb-1" />
       <div className="ml-1  flex py-3 justify-start flex-1 lg:mr-32">
-        <div className="relative w-full  max-w-xl mr-6 focus-within:text-purple-500">
+        <div className="relative w-full max-w-xl mr-6 focus-within:text-purple-500">
           <div className="absolute inset-y-0 flex items-center pl-2">
             <SearchIcon className="w-4 h-4" aria-hidden="true" />
           </div>
@@ -168,11 +118,13 @@ function Shipment() {
         <Table className=" w-full">
           <TableHeader>
             <tr>
-              <TableCell>Customer</TableCell>
-              <TableCell>Address</TableCell>
-              <TableCell>Shipment Date</TableCell>
-              <TableCell>Pickup Date</TableCell>
+              <TableCell>Requested item</TableCell>
+              <TableCell>Qty</TableCell>
+              <TableCell>Date</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>validation</TableCell>
+
+              <TableCell>Process</TableCell>
               <TableCell className="text-center">Action</TableCell>
             </tr>
           </TableHeader>
@@ -180,46 +132,43 @@ function Shipment() {
             {dataTable.map((data, i) => (
               <TableRow key={i}>
                 <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{data.customer_name}</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {data.transfer_no}
-                      </p>
-                    </div>
-                  </div>
+                  <Link
+                    to={`/app/requests/detail/${data.id}`}
+                    className="text-sm"
+                  >
+                    {data.assets.name}
+                  </Link>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{data.shipment_address}</span>
+                  <span className="text-sm">{data.quantity}</span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">
-                    {new Date(data.shipment_date).toLocaleString()}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">
-                    {new Date(data.pickup_date).toLocaleString()}
-                  </span>
+                  <span className="text-sm">{data.date}</span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">{data.status}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{data.status}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">open</span>
                 </TableCell>
                 <TableCell>
                   <div className="flex   justify-center ">
                     <div className=" space-x-4">
                       <Button
                         tag={Link}
-                        to={`/app/shipment/track-trace/${data.id}`}
+                        to={`/app/questioner/question/3001/${data.id}`}
                         layout="link"
                         size="icon"
-                        aria-label="Search"
+                        aria-label="Edit"
                       >
                         <SearchIcon className="w-5 h-5" aria-hidden="true" />
                       </Button>
                       <Button
                         tag={Link}
-                        to={`/app/shipment/edit/${data.id}`}
+                        to={`/app/requests/edit/${data.id}`}
                         layout="link"
                         size="icon"
                         aria-label="Edit"
@@ -254,4 +203,4 @@ function Shipment() {
   )
 }
 
-export default Shipment
+export default Requests

@@ -7,13 +7,10 @@ import {
 } from 'react-router-dom'
 import AccessibleNavigationAnnouncer from './components/AccessibleNavigationAnnouncer'
 import { PrivateRoute } from './routes/PrivateRoute'
-import { AuthProvider } from './contexts/Auth'
+import { AuthProvider } from './context/Auth'
 
 const Layout = lazy(() => import('./containers/Layout'))
 const Login = lazy(() => import('./pages/Login'))
-const CreateAccount = lazy(() => import('./pages/CreateAccount'))
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
-const Dashboard = lazy(() => import('./pages/Dashboard'))
 
 function App() {
   return (
@@ -23,16 +20,7 @@ function App() {
         <AuthProvider>
         <Switch>
           <Route path="/login" component={Login} />
-          <Route path="/create-account" component={CreateAccount} />
-          <Route path="/forgot-password" component={ForgotPassword} />
-          {/* <PrivateRoute>
-          <Route path="/dashboard" component={Dashboard} />
-          </PrivateRoute> */}
-          {/* Place new routes over this */}
           <PrivateRoute path="/app" component={Layout} />
-            
-    
-          {/* If you have an index page, you can remothis Redirect */}
           <Redirect exact from="/" to="/login" />
         </Switch>
         </AuthProvider>

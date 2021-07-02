@@ -1,66 +1,76 @@
 import { lazy } from 'react'
 
-const Dashboard = lazy(() => import('../pages/Dashboard'))
-const Shipment = lazy(() => import('../pages/Shipment'))
-const DetailShipment = lazy(() => import('../pages/DetailShipment'))
-const CreateShipment = lazy(() => import('../pages/CreateShipment'))
-const EditShipment = lazy(() => import('../pages/EditShipment'))
-const TrackTrace = lazy(() => import('../pages/TraceTrack'))
-const Employee = lazy(() => import('../pages/Employee'))
+const Requests = lazy(() => import('../pages/Requests'))
+const CreateRequest = lazy(() => import('../pages/CreateRequest'))
+const DetailRequest = lazy(() => import('../pages/DetailRequest'))
+const EditRequest = lazy(() => import('../pages/EditRequest'))
+const Assets = lazy(() => import('../pages/Assets'))
+const CreateAsset = lazy(() => import('../pages/CreateAsset'))
+const DetailAsset = lazy(() => import('../pages/DetailAsset'))
+const EditAsset = lazy(() => import('../pages/EditAsset'))
+const Employees = lazy(() => import('../pages/Employees'))
 const CreateEmployee = lazy(() => import('../pages/CreateEmployee'))
+const DetailEmployee = lazy(() => import('../pages/DetailEmployee'))
 const EditEmployee = lazy(() => import('../pages/EditEmployee'))
-const Schedule = lazy(() => import('../pages/Schedule'))
-const CreateSchedule = lazy(() => import('../pages/CreateSchedule'))
-const EditSchedule = lazy(() => import('../pages/EditSchedule'))
+const Questioner = lazy(() => import('../pages/Questioner'))
+const Decision = lazy(() => import('../pages/Decision'))
 
 const routes = [
   {
-    path: '/dashboard',
-    component: Dashboard,
+    path: '/requests',
+    component: Requests,
   },
   {
-    path: '/shipment',
-    component: Shipment,
+    path: '/requests/new',
+    component: CreateRequest,
   },
   {
-    path: '/shipment/new',
-    component: CreateShipment,
+    path: '/requests/detail/:id',
+    component: DetailRequest,
   },
   {
-    path: '/shipment/edit/:id',
-    component: EditShipment,
+    path: '/requests/edit/:id',
+    component: EditRequest,
   },
   {
-    path: '/shipment/track-trace/:id',
-    component: TrackTrace,
+    path: '/assets',
+    component: Assets,
   },
   {
-    path: '/shipment/detail/:id',
-    component: DetailShipment,
+    path: '/assets/new',
+    component: CreateAsset,
   },
   {
-    path: '/employee',
-    component: Employee,
+    path: '/assets/detail/:id',
+    component: DetailAsset,
   },
   {
-    path: '/employee/new',
+    path: '/assets/edit/:id',
+    component: EditAsset,
+  },
+  {
+    path: '/employees',
+    component: Employees,
+  },
+  {
+    path: '/employees/new',
     component: CreateEmployee,
   },
   {
-    path: '/employee/edit/:id',
+    path: '/employees/detail/:id',
+    component: DetailEmployee,
+  },
+  {
+    path: '/employees/edit/:id',
     component: EditEmployee,
   },
   {
-    path: '/schedule',
-    component: Schedule,
+    path: '/questioner/question/:question_id/:id',
+    component: Questioner,
   },
   {
-    path: '/schedule/new',
-    component: CreateSchedule,
-  },
-  {
-    path: '/schedule/edit/:id',
-    component: EditSchedule,
+    path: '/questioner/decision/:decision_id/:id',
+    component: Decision,
   },
 ]
 

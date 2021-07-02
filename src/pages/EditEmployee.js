@@ -1,24 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PageTitle from '../components/Typography/PageTitle'
-import { Input, HelperText, Label, Button, Select } from '@windmill/react-ui'
+import { Input, Label, Button, Select } from '@windmill/react-ui'
 import { Link, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { unwrapResult } from '@reduxjs/toolkit'
-import toast, { Toaster, useToaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { FulfillingBouncingCircleSpinner } from 'react-epic-spinners'
 import {
-  clearCreateShipmentStatus,
-  clearShipmentList,
-  clearShipmentListStatus,
-  createNewShipment,
-  updateShipment,
-} from '../app/shipmentsSlice'
-import { Editor } from '@tinymce/tinymce-react'
-import {
-  clearCreateEmployeeStatus,
   clearEmployeeUpdateStatus,
-  createNewEmployee,
   fetchEmployeeById,
   updateEmployee,
 } from '../app/employeesSlice'
@@ -26,55 +16,60 @@ import {
 function EditEmployee() {
   let { id } = useParams()
   const dispatch = useDispatch()
+
   const employeeById = useSelector((state) => state.employees.employeeById)
   const employeeByIdStatus = useSelector(
     (state) => state.employees.employeeByIdStatus,
   )
-  const employeesUpdateStatus = useSelector(
+
+  const employeeUpdateStatus = useSelector(
     (state) => state.employees.employeeUpdateStatus,
   )
 
-  const canSave = employeesUpdateStatus === 'idle'
+  React.useEffect(() => {
+    if (employeeByIdStatus === 'idle') {
+      dispatch(fetchEmployeeById(id))
+    }
+  }, [employeeByIdStatus, dispatch])
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState,
-    formState: { errors },
-    formState: { isSubmitSuccessful },
-  } = useForm({
+  const canSave = employeeUpdateStatus === 'idle'
+
+  const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       name: '',
+      department: '',
+      phone: '',
       role: '',
     },
   })
 
-  useEffect(() => {
-    if (employeeByIdStatus === 'idle') {
-      dispatch(fetchEmployeeById(id))
-    }
-    reset({
-      name: employeeById.name,
-      role: employeeById.role,
-    })
-  }, [employeeByIdStatus, dispatch])
-
   const onSubmit = async (data) => {
+    console.log(data)
     if (canSave)
       try {
         data.id = id
+        console.log(data)
         const resultAction = await dispatch(updateEmployee(data))
         unwrapResult(resultAction)
-        if (resultAction.payload !== null) {
-          toast.success('Berhasil menambahkan data!')
+        if (resultAction.payload[0] !== null) {
+          toast.success('Berhasil update data!')
         }
       } catch (error) {
-        if (error) throw toast.error('Gagal menambahkan data!')
+        if (error) throw toast.error('Gagal update data!')
       } finally {
         dispatch(clearEmployeeUpdateStatus())
       }
   }
+
+  React.useEffect(() => {
+    reset({
+      name: employeeById.name,
+      department: employeeById.department,
+      phone: employeeById.phone,
+      // email: employeeById.email,
+      role: employeeById.role,
+    })
+  }, [employeeById, reset])
 
   return (
     <>
@@ -107,40 +102,63 @@ function EditEmployee() {
           },
         }}
       />
-      <PageTitle>New Employee</PageTitle>
+
+      <PageTitle>Edit Employee : {id}</PageTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800 ">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-6 mt-4 mb-4 md:grid-cols-2 xl:grid-cols-2">
             <Label>
-              <span>Name :</span>
+              <span>Name</span>
               <Input
                 className="mt-1"
                 {...register('name', { required: true })}
               />
             </Label>
             <Label>
+              <span>Department</span>
+              <Input
+                className="mt-1"
+                {...register('department', { required: true })}
+              />
+            </Label>
+            <Label>
+              <span>Phone</span>
+              <Input
+                className="mt-1"
+                {...register('phone', { required: true })}
+              />
+            </Label>
+            {/* <Label>
+              <span>Email</span>
+              <Input
+                readOnly
+                type="email"
+                className="mt-1"
+                {...register('email', { required: true })}
+              />
+            </Label> */}
+
+            <Label>
               <span>Role</span>
               <Select
                 className="mt-1"
                 {...register('role', { required: true })}
               >
-                <option value="administrator">Administrator</option>
-                <option value="admin-staff">Staff Admin</option>
-                <option value="courier-staff">Staff Courier</option>
-                <option value="logistic-staff">Staff Logistic</option>
-                <option value="marketing-staff">Staff Marketing</option>
+                <option value="admin">Administrator</option>
+                <option value="staff">Staff</option>
+                <option value="it">Staff IT</option>
               </Select>
             </Label>
           </div>
           <div className="flex justify-between mt-5">
             <div>
-              <Button tag={Link} to="/app/shipment" size="small">
+              <Button tag={Link} to="/app/employees" size="small">
                 Cancel
               </Button>
             </div>
             <div>
-              {employeesUpdateStatus === 'loading' ? (
+              {employeeUpdateStatus === 'loading' ? (
                 <>
                   <FulfillingBouncingCircleSpinner size="20" />
                 </>

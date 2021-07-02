@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PageTitle from '../components/Typography/PageTitle'
 import { Input, Label, Button, Select } from '@windmill/react-ui'
 import { Link } from 'react-router-dom'
@@ -8,16 +8,44 @@ import { unwrapResult } from '@reduxjs/toolkit'
 import toast, { Toaster } from 'react-hot-toast'
 import { FulfillingBouncingCircleSpinner } from 'react-epic-spinners'
 import {
-  clearCreateEmployeeStatus,
-  createNewEmployee,
-} from '../app/employeesSlice'
+  clearCreateRequestStatus,
+  createNewRequest,
+} from '../app/requestsSlice'
+import { useAuth } from '../context/Auth'
+import { fetchAsset } from '../app/assetsSlice'
 
-function CreateEmployee() {
+function CreateRequest() {
+  const { user } = useAuth()
+  var today = new Date()
+  var dd = today.getDate()
+  var mm = today.getMonth() + 1 //January is 0!
+  var yyyy = today.getFullYear()
+
+  if (dd < 10) {
+    dd = '0' + dd
+  }
+
+  if (mm < 10) {
+    mm = '0' + mm
+  }
+
+  today = yyyy + '-' + mm + '-' + dd
+
   const dispatch = useDispatch()
-  const createEmployeeStatus = useSelector(
-    (state) => state.employees.createEmployeeStatus,
+  const createRequestStatus = useSelector(
+    (state) => state.requests.createRequestStatus,
   )
-  const canSave = createEmployeeStatus === 'idle'
+
+  const assetList = useSelector((state) => state.assets.assetList)
+  const assetListStatus = useSelector((state) => state.assets.assetListStatus)
+
+  useEffect(() => {
+    if (assetListStatus === 'idle') {
+      dispatch(fetchAsset())
+    }
+  }, [assetListStatus, dispatch])
+
+  const canSave = createRequestStatus === 'idle'
 
   const {
     register,
@@ -27,15 +55,18 @@ function CreateEmployee() {
     formState: { isSubmitSuccessful },
   } = useForm({
     defaultValues: {
-      email: '',
-      password: '',
+      employee_id: user.id,
+      asset_id: '',
+      quantity: '',
+      date: today,
+      status: 'draft',
     },
   })
 
   const onSubmit = async (data) => {
     if (canSave)
       try {
-        const resultAction = await dispatch(createNewEmployee(data))
+        const resultAction = await dispatch(createNewRequest(data))
         unwrapResult(resultAction)
         if (resultAction.payload.error === null) {
           toast.success('Berhasil menambahkan data!')
@@ -43,15 +74,18 @@ function CreateEmployee() {
       } catch (error) {
         if (error) throw toast.error('Gagal menambahkan data!')
       } finally {
-        dispatch(clearCreateEmployeeStatus())
+        dispatch(clearCreateRequestStatus())
       }
   }
 
   React.useEffect(() => {
     if (isSubmitSuccessful) {
       reset({
-        email: '',
-        password: '',
+        employee_id: user.id,
+        asset_id: '',
+        quantity: '',
+        date: today,
+        status: 'draft',
       })
     }
   }, [formState, reset])
@@ -88,36 +122,66 @@ function CreateEmployee() {
         }}
       />
 
-      <PageTitle>New Employee</PageTitle>
+      <PageTitle>New Request</PageTitle>
+      <div className="text-white">{JSON.stringify(user)}</div>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800 ">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-6 mt-4 mb-4 md:grid-cols-2 xl:grid-cols-2">
             <Label>
-              <span>Email</span>
+              <span>Employee ID</span>
               <Input
-                type="email"
                 className="mt-1"
-                {...register('email', { required: true })}
+                value={user.id}
+                {...register('employee_id', { required: true })}
               />
             </Label>
             <Label>
-              <span>Password</span>
-              <Input
-                type="password"
+              <span>Asset</span>
+              <Select
                 className="mt-1"
-                {...register('password', { required: true })}
+                {...register('asset_id', { required: true })}
+              >
+                {assetList.map((data) => (
+                  <option value={data.id}>{data.name}</option>
+                ))}
+              </Select>
+            </Label>
+            <Label>
+              <span>Quantity</span>
+              <Input
+                type="number"
+                className="mt-1"
+                {...register('quantity', { required: true })}
               />
             </Label>
+            <Label>
+              <span>Date</span>
+              <Input
+                type="date"
+                className="mt-1"
+                value={today}
+                {...register('date', { required: true })}
+              />
+            </Label>
+            <Label>
+              <span>Status</span>
+              <Input
+                className="mt-1"
+                value="draft"
+                {...register('status', { required: true })}
+              />
+            </Label>
+            <Label></Label>
           </div>
           <div className="flex justify-between mt-5">
             <div>
-              <Button tag={Link} to="/app/employees" size="small">
+              <Button tag={Link} to="/app/requests" size="small">
                 Cancel
               </Button>
             </div>
             <div>
-              {createEmployeeStatus === 'loading' ? (
+              {createRequestStatus === 'loading' ? (
                 <>
                   <FulfillingBouncingCircleSpinner size="20" />
                 </>
@@ -134,4 +198,4 @@ function CreateEmployee() {
   )
 }
 
-export default CreateEmployee
+export default CreateRequest
