@@ -4,6 +4,7 @@ import assetsReducer from './assetsSlice'
 import requestsReducer from './requestsSlice'
 import recordsReducer from './recordsSlice'
 import qandasReducer from './qandasSlice'
+import detailassetsReducer from './detailassetsSlice'
 
 export default configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export default configureStore({
     requests: requestsReducer,
     records: recordsReducer,
     qandas: qandasReducer,
+    detailassets: detailassetsReducer,
   },
 })

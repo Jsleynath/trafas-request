@@ -21,6 +21,7 @@ import {
   deleteAsset,
   fetchAsset,
 } from '../app/assetsSlice'
+import { clearDetailassetByIdStatus } from '../app/detailassetsSlice'
 
 function Assets() {
   const dispatch = useDispatch()
@@ -32,6 +33,15 @@ function Assets() {
   const results = fuse.search(query)
   const assetListStatus = useSelector((state) => state.assets.assetListStatus)
   const assetByIdStatus = useSelector((state) => state.assets.assetByIdStatus)
+  const detailassetByIdStatus = useSelector(
+    (state) => state.detailassets.detailassetByIdStatus,
+  )
+
+  useEffect(() => {
+    if (detailassetByIdStatus === 'succeeded') {
+      dispatch(clearDetailassetByIdStatus())
+    }
+  }, [detailassetByIdStatus, dispatch])
 
   useEffect(() => {
     if (assetByIdStatus === 'succeeded') {
@@ -114,9 +124,8 @@ function Assets() {
         <Table className=" w-full">
           <TableHeader>
             <tr>
-              <TableCell>Name</TableCell>
+              <TableCell>Category</TableCell>
               <TableCell>Qty</TableCell>
-              <TableCell>Unit</TableCell>
               <TableCell className="text-center">Action</TableCell>
             </tr>
           </TableHeader>
@@ -132,12 +141,8 @@ function Assets() {
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{data.quantity}</span>
+                  <span className="text-sm">{data.detail_assets.length}</span>
                 </TableCell>
-                <TableCell>
-                  <span className="text-sm">{data.unit}</span>
-                </TableCell>
-
                 <TableCell>
                   <div className="flex   justify-center ">
                     <div className=" space-x-4">

@@ -122,8 +122,6 @@ function Requests() {
               <TableCell>Qty</TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>validation</TableCell>
-
               <TableCell>Process</TableCell>
               <TableCell className="text-center">Action</TableCell>
             </tr>
@@ -136,7 +134,7 @@ function Requests() {
                     to={`/app/requests/detail/${data.id}`}
                     className="text-sm"
                   >
-                    {data.assets.name}
+                    {data.assets ? data.assets.name : ''}
                   </Link>
                 </TableCell>
                 <TableCell>
@@ -144,9 +142,6 @@ function Requests() {
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">{data.date}</span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{data.status}</span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">{data.status}</span>

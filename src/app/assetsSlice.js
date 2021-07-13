@@ -20,7 +20,10 @@ const initialState = {
 }
 
 export const fetchAsset = createAsyncThunk('assets/fetchAsset', async () => {
-  const response = await supabase.from('assets').select()
+  const response = await supabase.from('assets').select(`
+  id,
+  name,
+  detail_assets:detail_assets ( code,brand,name,qty  )`)
   return response
 })
 

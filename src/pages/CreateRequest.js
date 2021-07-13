@@ -123,7 +123,6 @@ function CreateRequest() {
       />
 
       <PageTitle>New Request</PageTitle>
-      <div className="text-white">{JSON.stringify(user)}</div>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800 ">
         <form onSubmit={handleSubmit(onSubmit)}>
