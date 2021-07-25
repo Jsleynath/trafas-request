@@ -9,6 +9,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { FulfillingBouncingCircleSpinner } from 'react-epic-spinners'
 import {
   clearCreateRequestStatus,
+  clearRequestListStatus,
   createNewRequest,
 } from '../app/requestsSlice'
 import { useAuth } from '../context/Auth'
@@ -36,8 +37,17 @@ function CreateRequest() {
     (state) => state.requests.createRequestStatus,
   )
 
+  const requestListStatus = useSelector(
+    (state) => state.requests.requestListStatus,
+  )
   const assetList = useSelector((state) => state.assets.assetList)
   const assetListStatus = useSelector((state) => state.assets.assetListStatus)
+
+  useEffect(() => {
+    if (requestListStatus === 'succeeded') {
+      dispatch(clearRequestListStatus())
+    }
+  }, [requestListStatus, dispatch])
 
   useEffect(() => {
     if (assetListStatus === 'idle') {
@@ -56,6 +66,7 @@ function CreateRequest() {
   } = useForm({
     defaultValues: {
       employee_id: user.id,
+      item_description: '',
       asset_id: '',
       quantity: '',
       date: today,
@@ -82,6 +93,7 @@ function CreateRequest() {
     if (isSubmitSuccessful) {
       reset({
         employee_id: user.id,
+        item_description: '',
         asset_id: '',
         quantity: '',
         date: today,
@@ -136,7 +148,15 @@ function CreateRequest() {
               />
             </Label>
             <Label>
-              <span>Asset</span>
+              <span>Item description</span>
+              <Input
+                type="text"
+                className="mt-1"
+                {...register('item_description', { required: true })}
+              />
+            </Label>
+            <Label>
+              <span>Category</span>
               <Select
                 className="mt-1"
                 {...register('asset_id', { required: true })}
@@ -157,9 +177,8 @@ function CreateRequest() {
             <Label>
               <span>Date</span>
               <Input
-                type="date"
+                type="datetime-local"
                 className="mt-1"
-                value={today}
                 {...register('date', { required: true })}
               />
             </Label>

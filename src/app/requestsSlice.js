@@ -24,9 +24,8 @@ export const fetchRequest = createAsyncThunk(
   async () => {
     const response = await supabase
       .from('requests')
-      .select(
-        `id,employees:employee_id ( name ),assets:asset_id ( name ),quantity,date,status`,
-      )
+      .select(`*,employees:employee_id ( name ),assets:asset_id ( name )`)
+      .order('created_at', { ascending: false })
     return response
   },
 )
@@ -62,8 +61,12 @@ export const updateRequest = createAsyncThunk(
     const { data, error } = await supabase
       .from('requests')
       .update({
-        name: updatedData.name,
-        role: updatedData.role,
+        employee_id: updatedData.employee_id,
+        item_description: updatedData.item_description,
+        asset_id: updatedData.asset_id,
+        quantity: updatedData.quantity,
+        date: updatedData.date,
+        status: updatedData.status,
       })
       .eq('id', updatedData.id)
     return data
@@ -135,7 +138,7 @@ const requestsSlice = createSlice({
     },
     [fetchRequest.fulfilled]: (state, action) => {
       state.requestListStatus = 'succeeded'
-      state.requestList = state.requestList.concat(action.payload.data)
+      state.requestList = action.payload.data
     },
     [fetchRequest.rejected]: (state, action) => {
       state.requestListStatus = 'failed'
@@ -146,7 +149,7 @@ const requestsSlice = createSlice({
     },
     [fetchRequestById.fulfilled]: (state, action) => {
       state.requestByIdStatus = 'succeeded'
-      state.requestById = action.payload.data
+      state.requestById = action.payload.data[0]
     },
     [fetchRequestById.rejected]: (state, action) => {
       state.requestByIdStatus = 'failed'

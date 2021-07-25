@@ -22,8 +22,11 @@ import {
   fetchAsset,
 } from '../app/assetsSlice'
 import { clearDetailassetByIdStatus } from '../app/detailassetsSlice'
-
+import { useAuth } from '../context/Auth'
 function Assets() {
+  const { user } = useAuth()
+  const temp = user?.user_metadata?.role ?? ''
+
   const dispatch = useDispatch()
 
   const [query, setQuery] = useState('')
@@ -146,23 +149,16 @@ function Assets() {
                 <TableCell>
                   <div className="flex   justify-center ">
                     <div className=" space-x-4">
-                      <Button
-                        tag={Link}
-                        to={`/app/assets/edit/${data.id}`}
-                        layout="link"
-                        size="icon"
-                        aria-label="Edit"
-                      >
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                      <Button
-                        onClick={() => removeOrganization(data.id)}
-                        layout="link"
-                        size="icon"
-                        aria-label="Delete"
-                      >
-                        <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
+                      {temp === 'admin' || temp === 'staff-admin' ? (
+                        <Button
+                          onClick={() => removeOrganization(data.id)}
+                          layout="link"
+                          size="icon"
+                          aria-label="Delete"
+                        >
+                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 </TableCell>

@@ -27,14 +27,19 @@ function CreateEmployee() {
     formState: { isSubmitSuccessful },
   } = useForm({
     defaultValues: {
+      name: '',
+      department: '',
+      phone: '',
       email: '',
       password: '',
+      role: '',
     },
   })
 
   const onSubmit = async (data) => {
     if (canSave)
       try {
+        data.role = { role: data.role }
         const resultAction = await dispatch(createNewEmployee(data))
         unwrapResult(resultAction)
         if (resultAction.payload.error === null) {
@@ -93,6 +98,38 @@ function CreateEmployee() {
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800 ">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-6 mt-4 mb-4 md:grid-cols-2 xl:grid-cols-2">
+            <Label>
+              <span>Name</span>
+              <Input
+                type="text"
+                className="mt-1"
+                {...register('name', { required: true })}
+              />
+            </Label>
+            <Label>
+              <span>Department</span>
+              <Input
+                type="text"
+                className="mt-1"
+                {...register('department', { required: true })}
+              />
+            </Label>
+            <Label>
+              <span>Phone</span>
+              <Input
+                type="text"
+                className="mt-1"
+                {...register('phone', { required: true })}
+              />
+            </Label>
+            <Label>
+              <span>Role</span>
+              <Input
+                type="text"
+                className="mt-1"
+                {...register('role', { required: true })}
+              />
+            </Label>
             <Label>
               <span>Email</span>
               <Input

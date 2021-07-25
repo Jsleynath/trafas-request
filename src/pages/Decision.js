@@ -1,18 +1,49 @@
 import React, { useEffect, useState } from 'react'
 import PageTitle from '../components/Typography/PageTitle'
 import { RadioGroup } from '@headlessui/react'
-import { Link, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { Link, useParams, useHistory } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import { Input, Label, Button, Select } from '@windmill/react-ui'
-
+import { updateRequest } from '../app/requestsSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { clearRequestListStatus } from '../app/requestsSlice'
 function Decision() {
+  const history = useHistory()
+  const dispatch = useDispatch()
   let { decision_id } = useParams()
   let { id } = useParams()
 
   const decisionName = useSelector(
     (state) => state.qandas.decisionNameList,
   ).find((x) => x.id === decision_id)
-  console.log(decisionName)
+
+  const requestListStatus = useSelector(
+    (state) => state.requests.requestListStatus,
+  )
+
+  useEffect(() => {
+    if (requestListStatus === 'succeeded') {
+      dispatch(clearRequestListStatus())
+    }
+  }, [requestListStatus, dispatch])
+
+  const canSave = true
+
+  const onSubmit = async (data) => {
+    if (canSave)
+      try {
+        data.id = id
+        console.log(data)
+        const resultAction = await dispatch(updateRequest(data))
+        unwrapResult(resultAction)
+        // console.log(resultAction)
+      } catch (error) {
+        // if (error) throw toast.error('Gagal menambahkan data!')
+      } finally {
+        // dispatch(clearRequestUpdateStatus())
+        history.push('/app')
+      }
+  }
 
   return (
     <>
@@ -22,18 +53,18 @@ function Decision() {
       <hr />
       <div className="w-full px-4 py-8 ">
         <div className="flex justify-center text-white text-2xl mb-5">
-          Permintaan anda : {decisionName.name}
+          PERMINTAAN ANDA {decisionName.name}
         </div>
         <div className="flex justify-center px-96">
           <Button
             tag={Link}
-            to="/app/requests"
-            className="bg-red-600 p-10"
+            onClick={() => onSubmit({ status: decisionName.status })}
+            className="bg-green-600 p-10"
             layout="link "
             size="large"
             aria-label="Edit"
           >
-            Back
+            SUBMIT
           </Button>
         </div>
       </div>

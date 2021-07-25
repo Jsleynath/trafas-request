@@ -19,6 +19,7 @@ import Fuse from 'fuse.js'
 import {
   deleteDetailasset,
   fetchDetailassetById,
+  fetchDetailassetByIdAsset,
 } from '../app/detailassetsSlice'
 import { fetchAssetById } from '../app/assetsSlice'
 import { useParams } from 'react-router-dom'
@@ -27,18 +28,20 @@ function DetailAsset() {
   const dispatch = useDispatch()
   let { id } = useParams()
 
-  const response = useSelector((state) => state.detailassets.detailassetById)
+  const response = useSelector(
+    (state) => state.detailassets.detailassetByIdAsset,
+  )
   const assetById = useSelector((state) => state.assets.assetById)
-  const detailassetByIdStatus = useSelector(
-    (state) => state.detailassets.detailassetByIdStatus,
+  const detailassetByIdAssetStatus = useSelector(
+    (state) => state.detailassets.detailassetByIdAssetStatus,
   )
 
   useEffect(() => {
-    if (detailassetByIdStatus === 'idle') {
-      dispatch(fetchDetailassetById(id))
+    if (detailassetByIdAssetStatus === 'idle') {
+      dispatch(fetchDetailassetByIdAsset(id))
       dispatch(fetchAssetById(id))
     }
-  }, [detailassetByIdStatus, dispatch])
+  }, [detailassetByIdAssetStatus, dispatch])
 
   const [pageTable, setPageTable] = useState(1)
 

@@ -90,7 +90,7 @@ function CreateAsset() {
         brand: '',
         name: '',
         asset_id: '',
-        qty: 0,
+        qty: 1,
         unit: '',
       })
     }
@@ -180,6 +180,7 @@ function CreateAsset() {
               <Input
                 className="mt-1"
                 type="number"
+                value="1"
                 {...register('qty', { required: true })}
               />
             </Label>

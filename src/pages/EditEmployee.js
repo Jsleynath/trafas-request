@@ -44,11 +44,10 @@ function EditEmployee() {
   })
 
   const onSubmit = async (data) => {
-    console.log(data)
     if (canSave)
       try {
         data.id = id
-        console.log(data)
+        data.role = { role: data.role }
         const resultAction = await dispatch(updateEmployee(data))
         unwrapResult(resultAction)
         if (resultAction.payload[0] !== null) {
@@ -66,7 +65,6 @@ function EditEmployee() {
       name: employeeById.name,
       department: employeeById.department,
       phone: employeeById.phone,
-      // email: employeeById.email,
       role: employeeById.role,
     })
   }, [employeeById, reset])
@@ -145,9 +143,9 @@ function EditEmployee() {
                 className="mt-1"
                 {...register('role', { required: true })}
               >
-                <option value="admin">Administrator</option>
+                <option value="admin">Admin</option>
+                <option value="staff-admin">Staff Admin</option>
                 <option value="staff">Staff</option>
-                <option value="it">Staff IT</option>
               </Select>
             </Label>
           </div>

@@ -8,6 +8,9 @@ const initialState = {
   detailassetById: [],
   detailassetByIdStatus: 'idle',
   detailassetByIdError: null,
+  detailassetByIdAsset: [],
+  detailassetByIdAssetStatus: 'idle',
+  detailassetByIdAssetError: null,
   createDetailasset: [],
   createDetailassetStatus: 'idle',
   createDetailassetError: null,
@@ -29,6 +32,17 @@ export const fetchDetailasset = createAsyncThunk(
 
 export const fetchDetailassetById = createAsyncThunk(
   'detailassets/fetchDetailassetById',
+  async (id) => {
+    const response = await supabase
+      .from('detail_assets')
+      .select('*')
+      .eq('id', id)
+    return response
+  },
+)
+
+export const fetchDetailassetByIdAsset = createAsyncThunk(
+  'detailassets/fetchDetailassetByIdAsset',
   async (id) => {
     const response = await supabase
       .from('detail_assets')
@@ -60,8 +74,12 @@ export const updateDetailasset = createAsyncThunk(
     const { data, error } = await supabase
       .from('detail_assets')
       .update({
+        code: updatedData.code,
+        brand: updatedData.brand,
         name: updatedData.name,
-        role: updatedData.role,
+        asset_id: updatedData.asset_id,
+        qty: updatedData.qty,
+        unit: updatedData.unit,
       })
       .eq('id', updatedData.id)
     return data
@@ -103,7 +121,7 @@ const detailassetsSlice = createSlice({
     },
     [fetchDetailasset.fulfilled]: (state, action) => {
       state.detailassetListStatus = 'succeeded'
-      state.detailassetList = state.detailassetList.concat(action.payload.data)
+      state.detailassetList = action.payload.data
     },
     [fetchDetailasset.rejected]: (state, action) => {
       state.detailassetListStatus = 'failed'
@@ -114,12 +132,25 @@ const detailassetsSlice = createSlice({
     },
     [fetchDetailassetById.fulfilled]: (state, action) => {
       state.detailassetByIdStatus = 'succeeded'
-      state.detailassetById = action.payload.data
+      state.detailassetById = action.payload.data[0]
     },
     [fetchDetailassetById.rejected]: (state, action) => {
       state.detailassetByIdStatus = 'failed'
       state.detailassetByIdError = action.error.message
     },
+
+    [fetchDetailassetByIdAsset.pending]: (state) => {
+      state.detailassetByIdAssetStatus = 'loading'
+    },
+    [fetchDetailassetByIdAsset.fulfilled]: (state, action) => {
+      state.detailassetByIdAssetStatus = 'succeeded'
+      state.detailassetByIdAsset = action.payload.data
+    },
+    [fetchDetailassetByIdAsset.rejected]: (state, action) => {
+      state.detailassetByIdAssetStatus = 'failed'
+      state.detailassetByIdAssetError = action.error.message
+    },
+
     [createNewDetailasset.pending]: (state) => {
       state.createDetailassetStatus = 'loading'
     },
