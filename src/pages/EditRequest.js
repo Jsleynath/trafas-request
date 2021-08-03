@@ -174,6 +174,7 @@ function CreateRequest() {
                 {...register('status', { required: true })}
               >
                 <option value="draft">Draft</option>
+                <option value="post pone">Post Pone</option>
                 <option value="to Buy">To Buy</option>
                 <option value="to Receive">To Receive</option>
                 <option value="done">Done</option>

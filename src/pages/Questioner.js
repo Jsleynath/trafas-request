@@ -12,6 +12,8 @@ import {
 } from '@windmill/react-ui'
 import { useForm } from 'react-hook-form'
 import { FulfillingBouncingCircleSpinner } from 'react-epic-spinners'
+import Sugar from 'sugar'
+
 function Questioner() {
   let { id } = useParams()
   console.log(id)
@@ -35,8 +37,8 @@ function Questioner() {
 
   return (
     <>
-      <div className="flex justify-center">
-        <div className="uppercase bold text-white text-3xl my-7">
+      <div className="flex justify-between">
+        <div className="uppercase bold text-white  text-3xl my-7">
           Questioner Permintaan Barang
         </div>
       </div>
@@ -160,16 +162,28 @@ function Question3001({
     },
   })
 
+  const nowDate = new Date()
+  const year = nowDate.getFullYear()
+  const month = nowDate.getMonth() + 1
+  const day = nowDate.getDay() + 5
+  const temp = String(year + '-' + month + '-' + day)
+  console.log(temp)
+
   const onSubmit = (data) => {
     setIsModalOpen(true)
-    if (new Date().toDateString() === new Date(data.date).toDateString()) {
+
+    if (
+      Sugar.Date.isBetween(
+        new Date(data.date),
+        new Date('2020-08-01'),
+        new Date(temp),
+      )
+    ) {
       setInterval(() => {
         setIsModalOpen(false)
         setLink('/app' + String(question.true) + String(id))
         setLinkStatus(false)
-        // return () => clearInterval()
       }, 4000)
-      // return <Redirect to={`/app${question.true}${id}`} />
     } else {
       setInterval(() => {
         setIsModalOpen(false)
@@ -215,10 +229,16 @@ function Question3004({
     },
   })
 
+  // input from the user
+  const min = 100000
+  const max = 2000000
+
+  // generating a random number
+  const randomNum = Math.floor(Math.random() * (max - min + 1)) + min
+
   const onSubmit = (data) => {
-    console.log(data)
     setIsModalOpen(true)
-    if (100000 > parseFloat(data.harga)) {
+    if (randomNum > parseFloat(data.harga)) {
       setInterval(() => {
         setIsModalOpen(false)
         setLink2('/app' + String(question.true) + String(id))
