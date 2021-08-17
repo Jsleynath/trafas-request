@@ -175,7 +175,7 @@ function CreateRequest() {
               />
             </Label>
             <Label>
-              <span>Date</span>
+              <span>Received Date</span>
               <Input
                 type="datetime-local"
                 className="mt-1"

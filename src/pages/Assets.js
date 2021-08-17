@@ -21,7 +21,10 @@ import {
   deleteAsset,
   fetchAsset,
 } from '../app/assetsSlice'
-import { clearDetailassetByIdStatus } from '../app/detailassetsSlice'
+import {
+  clearDetailassetByIdAssetStatus,
+  clearDetailassetByIdStatus,
+} from '../app/detailassetsSlice'
 import { useAuth } from '../context/Auth'
 function Assets() {
   const { user } = useAuth()
@@ -39,6 +42,15 @@ function Assets() {
   const detailassetByIdStatus = useSelector(
     (state) => state.detailassets.detailassetByIdStatus,
   )
+  const detailassetByIdAssetStatus = useSelector(
+    (state) => state.detailassets.detailassetByIdAssetStatus,
+  )
+
+  useEffect(() => {
+    if (detailassetByIdAssetStatus === 'succeeded') {
+      dispatch(clearDetailassetByIdAssetStatus())
+    }
+  }, [detailassetByIdAssetStatus, dispatch])
 
   useEffect(() => {
     if (detailassetByIdStatus === 'succeeded') {

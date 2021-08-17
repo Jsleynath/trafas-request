@@ -21,10 +21,23 @@ const initialState = {
 
 export const fetchRequest = createAsyncThunk(
   'requests/fetchRequest',
-  async () => {
+  async (data) => {
     const response = await supabase
       .from('requests')
       .select(`*,employees:employee_id ( name ),assets:asset_id ( name )`)
+      .order('created_at', { ascending: false })
+    return response
+  },
+)
+
+export const fetchFilterRequest = createAsyncThunk(
+  'requests/fetchFilterRequest',
+  async (data) => {
+    const response = await supabase
+      .from('requests')
+      .select(`*,employees:employee_id ( name ),assets:asset_id ( name )`)
+      .eq('status', data.status)
+      .rangeGt('date', [data.start_date, data.end_date])
       .order('created_at', { ascending: false })
     return response
   },
@@ -141,6 +154,17 @@ const requestsSlice = createSlice({
       state.requestList = action.payload.data
     },
     [fetchRequest.rejected]: (state, action) => {
+      state.requestListStatus = 'failed'
+      state.requestListError = action.error.message
+    },
+    [fetchFilterRequest.pending]: (state) => {
+      state.requestListStatus = 'loading'
+    },
+    [fetchFilterRequest.fulfilled]: (state, action) => {
+      state.requestListStatus = 'succeeded'
+      state.requestList = action.payload.data
+    },
+    [fetchFilterRequest.rejected]: (state, action) => {
       state.requestListStatus = 'failed'
       state.requestListError = action.error.message
     },

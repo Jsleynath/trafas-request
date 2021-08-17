@@ -114,6 +114,9 @@ const detailassetsSlice = createSlice({
     clearIdStatus: (state) => {
       state.idStatus = 'idle'
     },
+    clearDetailassetByIdAssetStatus: (state) => {
+      state.detailassetByIdAssetStatus = 'idle'
+    },
   },
   extraReducers: {
     [fetchDetailasset.pending]: (state) => {
@@ -201,6 +204,7 @@ export const {
   clearCreateDetailassetStatus,
   clearDetailassetUpdateStatus,
   clearDetailassetListStatus,
+  clearDetailassetByIdAssetStatus,
 } = detailassetsSlice.actions
 
 export default detailassetsSlice.reducer

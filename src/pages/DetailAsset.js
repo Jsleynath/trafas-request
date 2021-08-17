@@ -41,7 +41,7 @@ function DetailAsset() {
       dispatch(fetchDetailassetByIdAsset(id))
       dispatch(fetchAssetById(id))
     }
-  }, [detailassetByIdAssetStatus, dispatch])
+  }, [detailassetByIdAssetStatus, id, dispatch])
 
   const [pageTable, setPageTable] = useState(1)
 
@@ -65,11 +65,11 @@ function DetailAsset() {
         pageTable * resultsPerPage,
       ),
     )
-  }, [response, pageTable])
+  }, [id, response, pageTable])
   return (
     <>
       <PageTitle>
-        <div className="flex justify-between">Detail assets</div>
+        <div className="flex justify-between">Detail assets {`{ ${id} }`}</div>
         <div className=" text-sm ">
           category : {assetById[0] ? assetById[0].name : ''}
         </div>
@@ -81,6 +81,7 @@ function DetailAsset() {
           <TableHeader>
             <tr>
               <TableCell>Code</TableCell>
+              <TableCell>Entry Date</TableCell>
               <TableCell>Brand</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Qty</TableCell>
@@ -92,6 +93,11 @@ function DetailAsset() {
               <TableRow key={i}>
                 <TableCell>
                   <span className="text-sm">{data.code}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">
+                    {new Date(data.created_at).toDateString()}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">{data.brand}</span>

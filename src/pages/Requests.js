@@ -12,27 +12,86 @@ import {
   Button,
   Pagination,
   Input,
+  Select,
 } from '@windmill/react-ui'
-import { EditIcon, TrashIcon, SearchIcon } from '../icons'
+import { EditIcon, TrashIcon, SearchIcon, RefreshIcon } from '../icons'
 import { useDispatch, useSelector } from 'react-redux'
 import Fuse from 'fuse.js'
 import {
   clearRequestByIdStatus,
   deleteRequest,
+  fetchFilterRequest,
   fetchRequest,
 } from '../app/requestsSlice'
 import { useAuth } from '../context/Auth'
+import { FilterIcon } from '../icons'
+import { useForm } from 'react-hook-form'
 
 function Requests() {
   const { user } = useAuth()
+  const { register, handleSubmit, reset, formState } = useForm({
+    defaultValues: {
+      start_date: '',
+      end_date: '',
+    },
+  })
+  const [dataTable, setDataTable] = useState([])
+
+  const onSubmitFilter = async (data) => {
+    if (data.start_date) {
+      const oTime = new Date(data.start_date).valueOf()
+      const iTime = new Date(data.end_date).valueOf()
+
+      if (oTime >= iTime) {
+        alert('waktu awal harus lebih kecil dari waktu akhir')
+      }
+
+      setDataTable(
+        response.filter(
+          (value) =>
+            oTime < new Date(value.created_at).valueOf() &&
+            iTime > new Date(value.created_at).valueOf(),
+        ),
+      )
+    }
+
+    if (data.status) {
+      const oTime = new Date(data.start_date).valueOf()
+      const iTime = new Date(data.end_date).valueOf()
+
+      if (oTime >= iTime) {
+        alert('waktu awal harus lebih kecil dari waktu akhir')
+      }
+
+      if (data.start_time) {
+        setDataTable(
+          response
+            .filter(
+              (value) =>
+                oTime < new Date(value.created_at).valueOf() &&
+                iTime > new Date(value.created_at).valueOf(),
+            )
+            .filter((value) => value.status === data.status),
+        )
+      }
+      setDataTable(response.filter((value) => value.status === data.status))
+    }
+  }
+  const onSubmitRefresh = async (data) => {
+    reset({ start_date: '', end_date: '', status: '' })
+    setDataTable(
+      response.slice(
+        (pageTable - 1) * resultsPerPage,
+        pageTable * resultsPerPage,
+      ),
+    )
+  }
+
   const temp = user?.user_metadata?.role ?? ''
   const dispatch = useDispatch()
 
-  const [query, setQuery] = useState('')
   const response = useSelector((state) => state.requests.requestList)
-  const fuse = new Fuse(response, { keys: ['name'] })
 
-  const results = fuse.search(query)
   const requestListStatus = useSelector(
     (state) => state.requests.requestListStatus,
   )
@@ -54,8 +113,6 @@ function Requests() {
 
   const [pageTable, setPageTable] = useState(1)
 
-  const [dataTable, setDataTable] = useState([])
-
   const resultsPerPage = 7
   const totalResults = response.length
 
@@ -67,28 +124,14 @@ function Requests() {
     dispatch(deleteRequest(id))
   }
 
-  let searchResult = []
   useEffect(() => {
-    if (query) {
-      for (let index = 0; index < results.length; index++) {
-        searchResult = searchResult.concat(results[index].item)
-      }
-      setDataTable(
-        searchResult.slice(
-          (pageTable - 1) * resultsPerPage,
-          pageTable * resultsPerPage,
-        ),
-      )
-      console.log(searchResult)
-    } else {
-      setDataTable(
-        response.slice(
-          (pageTable - 1) * resultsPerPage,
-          pageTable * resultsPerPage,
-        ),
-      )
-    }
-  }, [response, query, pageTable])
+    setDataTable(
+      response.slice(
+        (pageTable - 1) * resultsPerPage,
+        pageTable * resultsPerPage,
+      ),
+    )
+  }, [response, pageTable])
 
   return (
     <>
@@ -103,19 +146,43 @@ function Requests() {
         </div>
       </PageTitle>
       <hr className="mb-1" />
-      <div className="ml-1  flex py-3 justify-start flex-1 lg:mr-32">
-        <div className="relative w-full max-w-xl mr-6 focus-within:text-purple-500">
-          <div className="absolute inset-y-0 flex items-center pl-2">
-            <SearchIcon className="w-4 h-4" aria-hidden="true" />
-          </div>
+      <div className="my-3 ">
+        <form className="flex flex-row" onSubmit={handleSubmit(onSubmitFilter)}>
+          <span className="mr-2 text-white w-3/12 text-center self-center">
+            Start Date
+          </span>
           <Input
-            className="pl-8 rounded-md text-gray-700"
-            placeholder="Search. . ."
-            aria-label="Search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            className="mr-2"
+            type="datetime-local"
+            {...register('start_date')}
           />
-        </div>
+          <span className="mr-2 text-white w-3/12 text-center self-center">
+            End Date
+          </span>
+          <Input
+            className="mr-3"
+            type="datetime-local"
+            {...register('end_date')}
+          />
+          <Select className="mr-2" {...register('status')}>
+            <option disabled selected>
+              select option ...
+            </option>
+            <option value="draft">draft</option>
+            <option value="postpone">postpone</option>
+            <option value="to Buy">to Buy</option>
+            <option value="to Receive">to Receive</option>
+            <option value="approved">approved</option>
+            <option value="rejected">rejected</option>
+            <option value="done">done</option>
+          </Select>
+          <Button type="submit" className="mr-2" size="small">
+            <FilterIcon />
+          </Button>
+          <Button onClick={onSubmitRefresh} size="small">
+            <RefreshIcon />
+          </Button>
+        </form>
       </div>
       <TableContainer className="mb-8 ">
         <Table className=" w-full">
@@ -126,9 +193,8 @@ function Requests() {
               <TableCell>Requested item</TableCell>
               <TableCell>Category</TableCell>
               <TableCell>Qty</TableCell>
-              <TableCell>Date</TableCell>
+              <TableCell>Received Date</TableCell>
               <TableCell>Status</TableCell>
-
               <TableCell className="text-center">Action</TableCell>
             </tr>
           </TableHeader>
